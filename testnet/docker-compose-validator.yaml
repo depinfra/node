@@ -83,3 +83,22 @@ services:
       - "5052:5052"
     restart: unless-stopped
 
+  validator:
+#    image: sigp/lighthouse:v5.3.0
+    image: ethpandaops/lighthouse:pawan-electra-alpha7-b2b728d
+    command:
+      - lighthouse
+      - vc
+      - --debug-level=info
+      - --testnet-dir=/config
+      - --validators-dir=/validator-keys/keys
+      - --secrets-dir=/validator-keys/secrets
+      - --init-slashing-protection
+      - --beacon-nodes=http://beacon:5052
+      - --suggested-fee-recipient=${FEE_RECIPIENT}
+    volumes:
+      - ./config:/config
+      - ./vc-data:/validator-keys
+    depends_on:
+      - beacon
+    restart: unless-stopped

@@ -1,7 +1,8 @@
 services:
 
-  init-geth:
-    image: ghcr.io/depinfra/geth:amd64 
+  init-erigon:
+    image: ghcr.io/depinfra/erigon
+    user: root
     command: >
        --datadir=/execution-data init /config/genesis.json
 
@@ -9,13 +10,13 @@ services:
       - ./data/execution-data:/execution-data
       - ./config:/config
 
-  geth:
-    image: ghcr.io/depinfra/geth:amd64 
+  erigon:
+    image: ghcr.io/depinfra/erigon
+    user: root
     depends_on:
-      - init-geth
+      - init-erigon
     command:
       - --networkid=${NETWORK_ID}
-      - --state.scheme=path
       - --verbosity=3
       - --datadir=/execution-data
       - --nat=extip:${NODE_PUBLIC_IP}
@@ -24,19 +25,12 @@ services:
       - --http.port=8545
       - --http.vhosts=*
       - --http.corsdomain=*
-      - --http.api=admin,engine,net,eth,web3,debug,txpool
+      - --http.api=admin,engine,net,eth,web3,debug,txpool,erigon,ots
       - --ws
-      - --ws.addr=0.0.0.0
-      - --ws.port=8546
-      - --ws.api=admin,engine,net,eth,web3,debug,txpool
-      - --ws.origins=*
-      - --allow-insecure-unlock
       - --authrpc.port=8551
       - --authrpc.addr=0.0.0.0
       - --authrpc.vhosts=*
       - --authrpc.jwtsecret=/config/jwtsecret
-      - --syncmode=full
-      - --rpc.allow-unprotected-txs
       - --bootnodes=${EL_NODES}
     volumes:
       - ./data/execution-data:/execution-data
@@ -67,7 +61,7 @@ services:
       - --port=9000
       - --target-peers=100
       - --testnet-dir=/config
-      - --execution-endpoints=http://geth:8551
+      - --execution-endpoints=http://erigon:8551
       - --jwt-secrets=/config/jwtsecret
       - --suggested-fee-recipient=${FEE_RECIPIENT}
       - --prune-blobs=false
@@ -77,7 +71,7 @@ services:
       - ./data/consensus-data:/root/.lighthouse
       - ./config:/config
     depends_on:
-      - geth
+      - erigon
     ports:
       - "9000:9000"
       - "5052:5052"
