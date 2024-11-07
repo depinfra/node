@@ -7,7 +7,7 @@ services:
 
     volumes:
       - ./data/execution-data:/execution-data
-      - ./config:/config
+      - ../config:/config
 
   geth:
     image: ghcr.io/depinfra/geth:amd64 
@@ -40,7 +40,7 @@ services:
       - --bootnodes=${EL_NODES}
     volumes:
       - ./data/execution-data:/execution-data
-      - ./config:/config
+      - ../config:/config
     ports:
       - "8545:8545"
       - "30303:30303"
@@ -75,7 +75,7 @@ services:
       - --boot-nodes=${CL_NODES}
     volumes:
       - ./data/consensus-data:/root/.lighthouse
-      - ./config:/config
+      - ../config:/config
     depends_on:
       - geth
     ports:
@@ -97,7 +97,7 @@ services:
       - --beacon-nodes=http://beacon:5052
       - --suggested-fee-recipient=${FEE_RECIPIENT}
     volumes:
-      - ./config:/config
+      - ../config:/config
       - ./vc-data:/validator-keys
     depends_on:
       - beacon
