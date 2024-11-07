@@ -1,7 +1,7 @@
 services:
 
   init-geth:
-    image: ghcr.io/depinfra/geth:amd64 
+    image: ghcr.io/depinfra/geth 
     command: >
        --datadir=/execution-data init /config/genesis.json
 
@@ -10,7 +10,7 @@ services:
       - ../config:/config
 
   geth:
-    image: ghcr.io/depinfra/geth:amd64 
+    image: ghcr.io/depinfra/geth 
     depends_on:
       - init-geth
     command:
