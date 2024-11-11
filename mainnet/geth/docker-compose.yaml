@@ -73,6 +73,7 @@ services:
       - --prune-blobs=false
       - --allow-insecure-genesis-sync
       - --boot-nodes=${CL_NODES}
+      - --disable-optimistic-finalized-sync
     volumes:
       - ./data/consensus-data:/root/.lighthouse
       - ../config:/config
