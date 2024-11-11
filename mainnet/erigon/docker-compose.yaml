@@ -1,0 +1,79 @@
+services:
+
+  init-erigon:
+    image: ghcr.io/depinfra/erigon
+    user: root
+    command: >
+       --datadir=/execution-data init /config/genesis.json
+
+    volumes:
+      - ./data/execution-data:/execution-data
+      - ../config:/config
+
+  erigon:
+    image: ghcr.io/depinfra/erigon
+    user: root
+    depends_on:
+      - init-erigon
+    command:
+      - --networkid=${NETWORK_ID}
+      - --verbosity=3
+      - --datadir=/execution-data
+      - --nat=extip:${NODE_PUBLIC_IP}
+      - --http
+      - --http.addr=0.0.0.0
+      - --http.port=8545
+      - --http.vhosts=*
+      - --http.corsdomain=*
+      - --http.api=admin,engine,net,eth,web3,debug,txpool,erigon,ots
+      - --ws
+      - --authrpc.port=8551
+      - --authrpc.addr=0.0.0.0
+      - --authrpc.vhosts=*
+      - --authrpc.jwtsecret=/config/jwtsecret
+      - --bootnodes=${EL_NODES}
+    volumes:
+      - ./data/execution-data:/execution-data
+      - ../config:/config
+    ports:
+      - "8545:8545"
+      - "30303:30303"
+    restart: unless-stopped
+
+  beacon:
+#    image: sigp/lighthouse:v5.3.0
+    image: ethpandaops/lighthouse:pawan-electra-alpha7-b2b728d
+    command:
+      - lighthouse
+      - beacon_node
+      - --disable-peer-scoring
+      - --disable-packet-filter
+      - --staking
+      - --http 
+      - --http-address=0.0.0.0
+      - --http-port=5052
+      - --enr-address=${NODE_PUBLIC_IP}
+      - --enr-udp-port=9000
+      - --enr-tcp-port=9000
+      - --validator-monitor-auto
+      - --http-allow-origin=*
+      - --listen-address=0.0.0.0
+      - --port=9000
+      - --target-peers=100
+      - --testnet-dir=/config
+      - --execution-endpoints=http://erigon:8551
+      - --jwt-secrets=/config/jwtsecret
+      - --suggested-fee-recipient=${FEE_RECIPIENT}
+      - --prune-blobs=false
+      - --allow-insecure-genesis-sync
+      - --boot-nodes=${CL_NODES}
+    volumes:
+      - ./data/consensus-data:/root/.lighthouse
+      - ../config:/config
+    depends_on:
+      - erigon
+    ports:
+      - "9000:9000"
+      - "5052:5052"
+    restart: unless-stopped
+
