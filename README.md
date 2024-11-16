@@ -2,7 +2,7 @@
 ## Deposit
 - create deposit/key data
 ```sh
-docker run -it --rm -v $(pwd)/keys:/app/validator_keys push ghcr.io/depinfra/staking-deposit-cli:latest new-mnemonic --num_validators=1 --mnemonic_language=english --eth1_withdrawal_address <withdrawal_address>
+docker run -it --rm -v $(pwd)/keys:/app/validator_keys  ghcr.io/depinfra/staking-deposit-cli:latest new-mnemonic --num_validators=1 --mnemonic_language=english --eth1_withdrawal_address <withdrawal_address>
 ```
 
 - deposit eth (params from deposit_data-xxx.json)
