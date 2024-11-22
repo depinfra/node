@@ -1,4 +1,8 @@
 # node
+## Install Foundry
+```sh
+curl -L https://foundry.paradigm.xyz | bash
+```
 ## Deposit
 - create deposit/key data
 ```sh
