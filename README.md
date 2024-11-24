@@ -1,7 +1,8 @@
 # node
-## Install Foundry
+## Install Foundry & jq
 ```sh
 curl -L https://foundry.paradigm.xyz | bash
+apt install jq
 ```
 ## Deposit
 - create deposit/key data
@@ -12,6 +13,15 @@ docker run -it --rm -v $(pwd)/keys:/app/validator_keys  ghcr.io/depinfra/staking
 - deposit eth (params from deposit_data-xxx.json)
 ```sh
 cast send <deposit_contract> "deposit(bytes,bytes,bytes,bytes32)" <pubkey> <withdraw_credentials> <signature> <deposit_root_data> --value 32ether --rpc-url https://rpc.depinfra.org --private-key 0xxxxx 
+```
+- deposit multiple validator (params from deposit_data-xxx.json)
+```sh
+for row in $(jq -c '. | map(.) | .[]' keys/deposit_data-xxx.json); do
+      _jq() {
+           echo ${row} | jq -r "${1}";
+      };
+      cast send <deposit_contract> "deposit(bytes,bytes,bytes,bytes32)" $(_jq '.pubkey') $(_jq '.withdrawal_credentials') $(_jq '.signature')  $(_jq '.deposit_data_root') --value 32ether --rpc-url https://rpc.depinfra.org --private-key 0xxxxx
+done
 ```
 ## Import account
 ```sh
